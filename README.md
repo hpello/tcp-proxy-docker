@@ -25,3 +25,8 @@ You would like to access a container running on the `compose_default` network, w
 ```bash
 docker run -d --network compose_default -p 8080:80 hpello/socat-proxy api:1234
 ```
+
+## Listen port
+
+By default, socat-proxy will listen on port 80, which is exposed in Dockerfile.
+This can be changed by setting the `LISTEN_PORT` environment variable.
