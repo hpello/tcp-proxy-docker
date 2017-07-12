@@ -6,6 +6,4 @@ RUN apk add --update \
 
 COPY socat-proxy.sh /usr/bin/socat-proxy
 
-EXPOSE 80
-
 ENTRYPOINT ["socat-proxy"]
