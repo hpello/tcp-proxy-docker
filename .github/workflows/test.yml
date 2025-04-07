@@ -1,0 +1,45 @@
+name: Test
+
+on:
+  pull_request:
+  merge_group:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@master
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build
+        uses: docker/build-push-action@v6
+        with:
+          load: true
+          tags: hpello/tcp-proxy:test
+      - name: Run Docker image
+        timeout-minutes: 1
+        run: |
+          set -x
+
+          docker run \
+            --rm -it -d \
+            --name tcp-proxy \
+            --add-host=host.docker.internal:host-gateway \
+            -p 5555:1234 \
+            hpello/tcp-proxy:test host.docker.internal 1234
+
+          while ! netcat -z localhost 5555; do
+            sleep 1
+          done
+
+          echo hello | netcat -l -q 0 -p 1234 &
+          result="$(netcat -d localhost 5555)"
+
+          if [ "$result" != "hello" ]; then
+            echo "Expected 'hello', but got '$result'"
+            exit 1
+          fi
+
+          docker kill tcp-proxy
