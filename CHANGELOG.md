@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.1.1
+
+- Set up auto-deploy.
+
 ## 1.1.0
 
 - Use exec to forward signals to socat (#1).
