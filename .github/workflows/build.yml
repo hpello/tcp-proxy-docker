@@ -15,13 +15,10 @@ jobs:
     steps:
       - name: Check out
         uses: actions/checkout@v4
-        with:
-          # Fetch tag information
-          fetch-depth: 0
       - name: Set variables
         run: |
           echo "GIT_SHA1=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
-          echo "GIT_TAG=$(git describe --tags --abbrev=0 | sed s/v//g)" >> "$GITHUB_ENV"
+          echo "CURRENT_VERSION=$(cat current-version)" >> "$GITHUB_ENV"
       - name: Login to Docker Hub
         if: github.ref_name == 'master'
         uses: docker/login-action@v3
@@ -36,5 +33,5 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: ${{ github.ref_name == 'master' }}
-          tags: hpello/tcp-proxy:${{ env.GIT_SHA1 }}, hpello/tcp-proxy:${{ env.GIT_TAG }}
+          tags: hpello/tcp-proxy:${{ env.CURRENT_VERSION }}-${{ env.GIT_SHA1 }}, hpello/tcp-proxy:${{ env.CURRENT_VERSION }}, hpello/tcp-proxy:latest
           platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64
