@@ -6,10 +6,12 @@ on:
   push:
     branches:
       - master
+  workflow_dispatch:
 
 jobs:
   docker:
     runs-on: ubuntu-latest
+    environment: ${{ github.ref_name == 'master' && 'production' || null }}
     steps:
       - name: Check out
         uses: actions/checkout@v4
@@ -33,6 +35,6 @@ jobs:
       - name: Build
         uses: docker/build-push-action@v6
         with:
-          push: false
+          push: ${{ github.ref_name == 'master' }}
           tags: hpello/tcp-proxy:${{ env.GIT_SHA1 }}, hpello/tcp-proxy:${{ env.GIT_TAG }}
           platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64
